@@ -14,12 +14,41 @@
 <script>
 $(document).ready(function(){
   let DEBUG = 1;  // 테스팅 메시지
+  let privateKey = "KzQubrWodifewrYEzGkBiGAdGGCFq9kZX7x1cT72iuA7ZzwJUNDh";
   let client = new CoinStack('c7dbfacbdf1510889b38c01b8440b1', '10e88e9904f29c98356fd2d12b26de', 'c3sp2.blocko.io', 'https');
 
   if (DEBUG) {
 	console.log("client: ", client);
     console.log('starting...');
   }
+  $('#send').on('click', function(){
+
+    let txBuilder = client.createTransactionBuilder();
+    let toaccount = $('#i_address').val();
+    let fromaccount = $('#new_address').val();
+    let coin = $('#coin').val();
+     txBuilder.addOutput(toaccount, CoinStack.Math.toSatoshi(coin));
+     txBuilder.setInput(fromaccount);
+     txBuilder.buildTransaction(function (err, tx) {
+     try {
+       
+      tx.sign(privateKey);
+       
+       let rawTx = tx.serialize();
+       client.sendTransaction(rawTx, function (err) {
+	 if (!err) {
+	     console.log("definition: ", tx.getHash());
+	     alert("거래가 완료 되었습니다..!!!");
+	 }
+       });
+    } catch (e) {
+       console.log(e)
+     
+      } //end of try
+  
+    }) // end of txbuilder
+  })
+
   $('#newBalance').on('click', function(){
     let addr = $('#i_address').val();
     client.getBalance(addr, function (err, balance) {
@@ -61,7 +90,8 @@ $(document).ready(function(){
   	<div id="tablePlace"></div>
   <button id="newAccount">New Account</button>
   <button id="newBalance">잔액조회</button>
-  <h5>송신처  <input id="i_address" size="45" placeholder=""></input> </h5>
+  <button id="send">전송</button>
+  <h5>송신처  <input id="i_address" size="45" value="1JKoHsCJNKvYLgaLQk4MhsJwtxBm1AUrsB" placeholder=""></input> </h5>
   <h5>수신처  <input id="new_address" size="45" placeholder=""></input> </h5>
   <h5>코인  <input id="coin" size="45" placeholder=""></input> </h5>
   </div>
