@@ -21,7 +21,15 @@ $(document).ready(function(){
     console.log('starting...');
   }
   $('#newBalance').on('click', function(){
-    
+    let addr = $('#i_address').val();
+    client.getBalance(addr, function (err, balance) {
+	    if (!err) {
+			var total = CoinStack.Math.toBitcoin(balance);
+			$('#message').text(" total: " + total);
+			console.log("address: ", addr);
+			console.log('total: ',total);
+		}
+     });
   })
   $('#newAccount').on('click', function(){
     let privateKey = CoinStack.ECKey.createKey();
